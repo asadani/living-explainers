@@ -1,0 +1,181 @@
+{
+  "schema_version": 1,
+  "id": "document-preview",
+  "title": "A document preview request",
+  "scope": "One synchronous preview request from handler to renderer. Background jobs and retries are outside this trace.",
+  "sources": [
+    {
+      "id": "request-handler",
+      "path": "handler.py",
+      "line_start": 1,
+      "line_end": 5,
+      "sha256": "c0148582df478fcd5b6f72469dab6f6d10af56343d194f2adfe2c4ecdddc90dd",
+      "review_status": "confirmed",
+      "reviewer": "Example maintainer",
+      "reviewed_at": "2026-10-22T08:00:00Z"
+    },
+    {
+      "id": "access-check",
+      "path": "authorization.py",
+      "line_start": 1,
+      "line_end": 5,
+      "sha256": "c29b26021bba6984d29457bde89062f523679dda19b04ab199466aabdef6bec8",
+      "review_status": "confirmed",
+      "reviewer": "Example maintainer",
+      "reviewed_at": "2026-10-22T08:00:00Z"
+    },
+    {
+      "id": "render-call",
+      "path": "renderer.py",
+      "line_start": 1,
+      "line_end": 5,
+      "sha256": "0652aeb36f7d4f7786bfde1b8c444ab132577b09d64f9d3416d756f0c45d4026",
+      "review_status": "confirmed",
+      "reviewer": "Example maintainer",
+      "reviewed_at": "2026-10-22T08:00:00Z"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "request",
+      "label": "Receive preview request",
+      "summary": "The handler requires both a user and a document before continuing.",
+      "origin": "observed",
+      "source_ids": [
+        "request-handler"
+      ]
+    },
+    {
+      "id": "authorize",
+      "label": "Check active membership and access",
+      "summary": "The authorization function blocks inactive membership and private documents.",
+      "origin": "observed",
+      "source_ids": [
+        "access-check"
+      ],
+      "assumptions": [
+        "The document visibility rules are represented by can_view; that function is outside this fixture."
+      ]
+    },
+    {
+      "id": "render",
+      "label": "Ask the renderer for a preview",
+      "summary": "The handler returns the renderer result when access is allowed.",
+      "origin": "observed",
+      "source_ids": [
+        "request-handler",
+        "render-call"
+      ]
+    },
+    {
+      "id": "timeout",
+      "label": "Return a retryable unavailable result",
+      "summary": "Renderer timeout is represented as an unavailable response.",
+      "origin": "stated",
+      "source_ids": [
+        "render-call"
+      ]
+    },
+    {
+      "id": "retry-policy",
+      "label": "Whether the caller retries",
+      "summary": "The caller retry behavior is not present in these files.",
+      "origin": "proposed",
+      "source_ids": [],
+      "assumptions": [
+        "The example does not claim a retry occurs."
+      ]
+    }
+  ],
+  "paths": [
+    {
+      "id": "allowed",
+      "label": "Access allowed",
+      "trigger": "A complete request from an active member who can view the document.",
+      "steps": [
+        {
+          "node_id": "request",
+          "explanation": "The handler rejects incomplete arguments before authorization."
+        },
+        {
+          "node_id": "authorize",
+          "explanation": "Active membership is required and document visibility is checked."
+        },
+        {
+          "node_id": "render",
+          "explanation": "An allowed decision forwards the document content to the renderer."
+        }
+      ],
+      "outcome": "The rendered preview is returned.",
+      "origin": "observed"
+    },
+    {
+      "id": "denied",
+      "label": "Access denied",
+      "trigger": "The user is missing, inactive, or cannot view the document.",
+      "steps": [
+        {
+          "node_id": "request",
+          "explanation": "The request reaches the handler with a user and document."
+        },
+        {
+          "node_id": "authorize",
+          "explanation": "A failed membership or visibility check returns a denied decision."
+        }
+      ],
+      "outcome": "No preview is returned.",
+      "origin": "observed"
+    },
+    {
+      "id": "renderer-timeout",
+      "label": "Renderer times out",
+      "trigger": "Authorization succeeds but rendering exceeds its timeout.",
+      "steps": [
+        {
+          "node_id": "request",
+          "explanation": "The handler validates the request."
+        },
+        {
+          "node_id": "authorize",
+          "explanation": "The user is allowed to view the document."
+        },
+        {
+          "node_id": "render",
+          "explanation": "The handler invokes the renderer."
+        },
+        {
+          "node_id": "timeout",
+          "explanation": "The renderer catches its timeout and returns a retryable unavailable result."
+        }
+      ],
+      "outcome": "A retryable unavailable response is returned.",
+      "origin": "stated"
+    }
+  ],
+  "questions": [
+    {
+      "id": "who-can-view",
+      "label": "Who can view a preview?",
+      "path_id": "allowed",
+      "note": "Covered by the allowed path."
+    },
+    {
+      "id": "inactive-member",
+      "label": "What happens for inactive membership?",
+      "path_id": "denied",
+      "note": "Covered by the denied path."
+    },
+    {
+      "id": "renderer-fails",
+      "label": "What happens when rendering times out?",
+      "path_id": "renderer-timeout",
+      "note": "Covered by the timeout path."
+    },
+    {
+      "id": "caller-retry",
+      "label": "Does the caller retry after a timeout?",
+      "path_id": null,
+      "note": "Not covered: the caller retry policy is outside the cited source files."
+    }
+  ]
+}

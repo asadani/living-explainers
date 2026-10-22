@@ -1,0 +1,19 @@
+{
+  "profile": "product-admin",
+  "sourceRoots": ["living_explainers"],
+  "locale": "en",
+  "canonicalMap": "UX-CONTRACT.md",
+  "requiredCapabilities": ["Select/Listbox", "Scrollbar"],
+  "ownership": {
+    "Select/Listbox": "native",
+    "Scrollbar": "authored"
+  },
+  "requiredCommands": ["unit", "javascript"],
+  "commands": {
+    "unit": "python -m unittest discover -s tests -v",
+    "javascript": "node --check living_explainers/explorer.js"
+  },
+  "evidence": {
+    "flow": "tests/test_core.py"
+  }
+}
