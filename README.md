@@ -2,6 +2,10 @@
 
 Living Explainers turns an explicitly authored JSON request trace into a self-contained offline explorer. It keeps the selected path, source line references, assumptions, and build-time freshness status together. The example follows a document preview through request validation, access review, and rendering.
 
+## Requirements
+
+Python 3.11 or newer runs the CLI without third-party Python dependencies. JavaScript checks in the development test suite also require Node.js; local verification used Node.js 26.12.0. Opening the generated HTML needs a JavaScript-capable browser.
+
 ## Quickstart
 
 Run these commands from this repository directory with Python 3.11 or newer:
