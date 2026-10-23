@@ -57,3 +57,7 @@ This tool validates and renders authored claims; it does not infer architecture,
 Validation checks source existence and cited ranges even for proposed references. Exported pages can still show missing or unreviewed sources. Report/build output paths cannot replace the model or referenced sources; `review-source` is the explicit operation that can atomically update a model.
 
 See [verification coverage](docs/VERIFICATION.md) and [the design plan](docs/PLAN.md) for tested behavior and remaining limits.
+
+## License
+
+Licensed under the [MIT License](LICENSE). Copyright (c) 2026 Anuj Sadani.
