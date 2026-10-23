@@ -1,4 +1,6 @@
-![Living Explainers](assets/logo.svg)
+<p align="center">
+  <img src="assets/logo.svg" alt="Living Explainers — Follow the system. See the source." width="400" height="160">
+</p>
 
 Living Explainers turns an explicitly authored JSON request trace into a self-contained offline explorer. It keeps the selected path, source line references, assumptions, and build-time freshness status together. The example follows a document preview through request validation, access review, and rendering.
 
